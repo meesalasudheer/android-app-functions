@@ -18,11 +18,19 @@ Implemented in `app/src/main/java/com/example/appfunctionsdemo/functions/Expense
 ## Build + test
 
 ```bash
+# Unit tests + lint + coverage gates
 ./gradlew check
+
+# Caller module build + unit tests
 ./gradlew :agent-caller:assembleDebug :agent-caller:testDebugUnitTest
+
+# Connected instrumentation tests (requires running emulator/device)
+./gradlew :agent-caller:connectedDebugAndroidTest
 ```
 
 This runs unit tests, lint, and coverage verification.
+
+For CI, run the first two commands on all pipelines, and run the connected test command on pipelines where an Android 16+ emulator/device is available.
 
 ## Coverage gates
 

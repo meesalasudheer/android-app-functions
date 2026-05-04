@@ -59,6 +59,8 @@ class AgentCallerAppTest {
 
         composeRule.onNodeWithTag("invokeListButton").performClick()
         composeRule.onNodeWithTag("statusText").assertTextContains("listRecentExpenses -> Fake list success")
-        composeRule.onNodeWithText("#42 Fake expense").assertTextContains("Fake expense")
+        composeRule.onNodeWithText("#42 Fake expense").assertExists()
+        composeRule.onNodeWithText("1200 cents paid by Alex").assertExists()
+        composeRule.onNodeWithText("Participants: Alex, Sam").assertExists()
     }
 }
