@@ -4,8 +4,11 @@ import android.content.Context
 import android.os.Build
 import androidx.appfunctions.AppFunctionData
 import androidx.appfunctions.AppFunctionManager
+import androidx.appfunctions.AppFunctionSearchSpec
 import androidx.appfunctions.ExecuteAppFunctionRequest
 import androidx.appfunctions.ExecuteAppFunctionResponse
+import androidx.appfunctions.metadata.AppFunctionMetadata
+import kotlinx.coroutines.flow.first
 
 class AndroidAgentCaller(
     context: Context,
@@ -38,8 +41,17 @@ class AndroidAgentCaller(
             )
 
         return try {
-            val params = AppFunctionData(qualifiedName = "com.example.appfunctionsdemo.functions.AddSharedExpenseRequest")
-                .toBuilder()
+            val metadata = findFunctionMetadata(
+                manager = manager,
+                functionId = TargetAppFunctions.ADD_SHARED_EXPENSE_ID
+            ) ?: return AddExpenseCallResult(
+                success = false,
+                message = "Target function metadata not found. Is the provider app installed/indexed?",
+                expenseId = null,
+                balances = emptyList()
+            )
+
+            val params = AppFunctionData.Builder(metadata.parameters, metadata.components)
                 .setString("description", description)
                 .setLong("amountCents", amountCents)
                 .setString("paidBy", paidBy)
@@ -93,8 +105,15 @@ class AndroidAgentCaller(
             )
 
         return try {
-            val params = AppFunctionData(qualifiedName = "com.example.appfunctionsdemo.functions.ListRecentExpensesRequest")
-                .toBuilder()
+            val metadata = findFunctionMetadata(
+                manager = manager,
+                functionId = TargetAppFunctions.LIST_RECENT_EXPENSES_ID
+            ) ?: return ListExpensesCallResult(
+                message = "Target function metadata not found. Is the provider app installed/indexed?",
+                expenses = emptyList()
+            )
+
+            val params = AppFunctionData.Builder(metadata.parameters, metadata.components)
                 .setInt("limit", limit)
                 .build()
 
@@ -137,7 +156,7 @@ class AndroidAgentCaller(
             }
             .orEmpty()
 
-        val expenseId = if (resultData.contains("expenseId")) {
+        val expenseId = if (resultData.containsKey("expenseId")) {
             resultData.getLong("expenseId", 0L)
         } else {
             null
@@ -171,5 +190,16 @@ class AndroidAgentCaller(
             message = "Loaded ${expenses.size} expense(s).",
             expenses = expenses
         )
+    }
+
+    private suspend fun findFunctionMetadata(
+        manager: AppFunctionManager,
+        functionId: String
+    ): AppFunctionMetadata? {
+        val searchSpec = AppFunctionSearchSpec(packageNames = setOf(targetPackage))
+        return manager.observeAppFunctions(searchSpec)
+            .first()
+            .flatMap { it.appFunctions }
+            .firstOrNull { it.id == functionId }
     }
 }

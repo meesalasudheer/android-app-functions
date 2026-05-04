@@ -6,6 +6,7 @@ A dedicated multi-module Android sample showing how to expose Android AppFunctio
 
 - `app`: Compose UI + AppFunctions provider (`ExpenseAgentFunctions`)
 - `core:ledger`: Pure Kotlin expense logic reused by UI and AppFunctions
+- `agent-caller`: Separate caller app that discovers metadata and executes target app functions
 
 ## AppFunctions included
 
@@ -18,6 +19,7 @@ Implemented in `app/src/main/java/com/example/appfunctionsdemo/functions/Expense
 
 ```bash
 ./gradlew check
+./gradlew :agent-caller:assembleDebug :agent-caller:testDebugUnitTest
 ```
 
 This runs unit tests, lint, and coverage verification.
@@ -41,6 +43,13 @@ adb shell cmd app_function list-app-functions
 ```
 
 You should see this package and the exposed functions.
+
+## Agent caller app usage
+
+1. Install provider app and caller app on the same Android 16+ device.
+2. Open **Agent Caller** app (`com.example.agentcaller`).
+3. Tap **Invoke addSharedExpense** then **Invoke listRecentExpenses**.
+4. Caller discovers target metadata via `observeAppFunctions(...)`, builds typed `AppFunctionData` with metadata, and executes.
 
 ## Important note on callers
 
