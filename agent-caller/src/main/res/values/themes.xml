@@ -1,0 +1,3 @@
+<resources>
+    <style name="Theme.AgentCaller" parent="Theme.AppCompat.DayNight.NoActionBar" />
+</resources>
