@@ -22,6 +22,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import com.example.agentcaller.AgentCaller
 import com.example.agentcaller.ExpenseItem
@@ -115,7 +117,7 @@ fun AgentCallerApp(agentCaller: AgentCaller) {
                             status = "addSharedExpense -> ${result.message}"
                         }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().semantics { testTag = "invokeAddButton" }
                 ) {
                     Text("Invoke addSharedExpense")
                 }
@@ -130,14 +132,18 @@ fun AgentCallerApp(agentCaller: AgentCaller) {
                             status = "listRecentExpenses -> ${result.message}"
                         }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().semantics { testTag = "invokeListButton" }
                 ) {
                     Text("Invoke listRecentExpenses")
                 }
             }
 
             item {
-                Text(text = status, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = status,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.semantics { testTag = "statusText" }
+                )
             }
 
             item {
